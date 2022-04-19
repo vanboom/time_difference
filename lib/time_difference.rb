@@ -5,7 +5,7 @@ class TimeDifference
 
   private_class_method :new
 
-  TIME_COMPONENTS = [:years, :months, :weeks, :days, :hours, :minutes, :seconds]
+  TIME_COMPONENTS = [:years, :months, :weeks, :days, :hours, :minutes]
 
   def self.between(start_time, end_time)
     new(start_time, end_time)
@@ -45,9 +45,10 @@ class TimeDifference
     end]
   end
 
-  def in_general
+  def in_general(components: nil)
     remaining = @time_diff
-    Hash[TIME_COMPONENTS.map do |time_component|
+    components ||= TIME_COMPONENTS
+    Hash[components.map do |time_component|
       if remaining > 0
         rounded_time_component = (remaining / 1.send(time_component).seconds).round(2).floor
         remaining -= rounded_time_component.send(time_component)
@@ -58,11 +59,11 @@ class TimeDifference
     end]
   end
 
-  def humanize
+  def humanize(components: nil)
     diff_parts = []
-    in_general.each do |part,quantity|
+    in_general(components: components).each do |part,quantity|
       next if quantity <= 0
-      part = part.to_s.humanize
+      part = part.to_s
 
       if quantity <= 1
         part = part.singularize
